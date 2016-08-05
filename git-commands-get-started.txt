@@ -1,0 +1,12 @@
+#These are the command-line commands I used to start with github from my laptop
+
+ 2104  git clone https://github.com/gautamghose/lessons.git
+ 2118  git status
+ 2142  git status
+ 2148  git add justC/* cplus/* python/my_mailer.py 
+ 2149  git status
+ 2150  git commit -m "First set of stuff added."
+ 2151  git status
+ 2152  git push https://gautamghose@github.com/gautamghose/lessons.git
+
+
