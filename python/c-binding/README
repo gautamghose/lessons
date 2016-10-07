@@ -1,0 +1,16 @@
+0. I looked at the instructions at https://docs.python.org/2/extending/extending.html and followed along.
+1. cd to this 'c-binding' directory.
+2. First created the spammodule.c file <source code is in this directory>
+3. Then followed along the instructions at https://docs.python.org/2/extending/building.html#building.
+4. Created the setup.py file <source code in this directory>
+5. Ran the "python setup.py build" command to actually compile the above c file, spammodule.c.
+6. It created a build subdirectory and the shared object in there.
+7. Then ran the "sudo python setup.py install" command to get this "spam" module installed into some
+   system directory /usr/local/lib/python2.7/dist-packages/spam.so.
+8. Now when I inoked the python interpreter from this shell, I could do "import spam" and it worked :)
+9. Then I could run the spap.system("ls -l") command and produced the "ls -l" output for the current dir.
+10. Awesome!!
+11. Doing "print sys.modules" shows all these extensionmodules. I found my 'spam' module there.
+    Also, could do "print sys.modules['spam']" and it printed the expected stuff.
+12. Gotcha: I couldn't find out the command to uninstall my 'spam' module !! Abhimanyu, all over !?
+
