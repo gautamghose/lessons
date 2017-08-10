@@ -1,0 +1,39 @@
+1. Used get_snp500.py to retrieve a list of S&P500 company tickers, and their categories.
+        $.> get_snp500.py > sp500.txt
+
+2. Used get_historical.py to retrieve all historical quotes for all S&P500 tickers.
+    This script takes a 'tickers.lst' file and all ticker symbols it finds, it retrieves
+    their historical quotes from google-financial. The sp500.txt file produced in (1)
+    above could be copied into tickers.lst and get_historical.py will work on it.
+    For each ticker in ticker.lst file, the get_historical.py script will produce
+    a <ticker-symbol>.csv file in the current directory.
+    So after get_historical.py is run, the current directory will have about 500 *.csv
+    files.
+        $./raw_data> ../get_historical.py
+
+3. Used count_events.py to identify all the significant "events" in each of the csv
+    file.
+        #Usage: <script-name> <percent-move> <list of TICKER.csv filenames>
+        $./raw_data> ../count_events.py 7.0 *.csv > ../events/7pct_events
+
+4. Used identify_market_events.py to parse the 7pct_events file produced at (3) to
+    produce a file that would carry all the event dates that are deemed "market event".
+    A "market event" is when multiple (in our example, 3) tickers moved by a significant
+    percentage; i.e. 3 or more tickers had events on the same date.
+        #Usage: <script-name> <filename-with-eventdates-foreach-ticker>
+        $./events> ../identify_market_events.py  7pct_events > 7pct_market_events
+
+5. Used identify_ticker_events.py to parse the original 7pct_events file, produced at (3)
+    and the 7pct_market_events file produced at (4), find the non-overlaps and hence
+    identify the ticker-specific events.
+        #Usage: <script-name> <filename-with-eventdates-foreach-ticker> <filename-with-market-eventdates>
+        $./events> ../identify_ticker_events.py 7pct_events 7pct_market_events > 7pct_ticker_events
+
+6. Used ../generate_feature_data.py to read the 7pct_ticker_events file, produced at (5)
+    and for each such event it consults the corresponding csv file for the ticker and
+    prints out the percentage movement of that ticker for the previous 15 days. 
+        #Usage: <script-name> <filename-with-all-identified-ticker-events> <directory-of-raw-csvfiles> <number-of-prior-days>
+        $./feature_data> ../generate_feature_data.py ../events/7pct_ticker_events  ../raw_data  15 > featured_events.csv
+
+ 
+
