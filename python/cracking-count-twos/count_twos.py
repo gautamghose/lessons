@@ -34,9 +34,21 @@ def count_2s(N):
 
   if i == 0:
     return count
-  print "count", count, "+", "count_2s(", N%tenexp, ")"
   return count + count_2s(N % tenexp)
   
+def count_2s_bruteforce(N):
+  count = 0
+  i = 1
+  while i <= N:
+    istr = str(i)
+    idx = 0
+    while idx < len(istr):
+      if istr[idx] == '2':
+        count += 1
+      idx += 1
+    i += 1
+  return count
+
 if len(sys.argv) < 2:
   print "Usage:", sys.argv[0], "<any-positive-integer>"
   sys.exit(1)
@@ -46,20 +58,19 @@ if val < 0:
   print val, "is not a positive number."
   sys.exit(1)
 
-print "Number of twos:", count_2s(val)
+print "Number of 2s upto", val, "is", count_2s(val)
 sys.exit(0)
 
-valstr = str(val)
-nr_digits = len(valstr)
-i = 0
-sum=0
-while i < nr_digits:
-  d = int(valstr[nr_digits-1-i])
-  sum = (d+1)*sum
-  if d >= 2:
-    sum += ten_raised_to(i)
+i = 1
+while i <= val:
+  v1 = count_2s(i)
+  v2 = count_2s_bruteforce(i)
+  assert(v1 == v2), "v1: {0} v2: {1} did not match for i= {2}".format(v1,v2,i)
   i += 1
+  if i % 5000 == 0:
+    print "Processed", i, "numbers till now."
 
-print "Number of twos:", sum
+print "Number of twos:", count_2s(val)
+print "Number of twos(brute force):", count_2s_bruteforce(val)
 sys.exit(0)
 
