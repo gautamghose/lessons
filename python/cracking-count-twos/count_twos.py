@@ -58,7 +58,7 @@ if val < 0:
   print val, "is not a positive number."
   sys.exit(1)
 
-print "Number of 2s upto", val, "is", count_2s(val)
+print "Answer:", count_2s(val)
 sys.exit(0)
 
 i = 1
