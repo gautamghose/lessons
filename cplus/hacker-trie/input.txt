@@ -1,0 +1,6 @@
+5
+add s
+add ss
+find s
+find ss
+find sss
