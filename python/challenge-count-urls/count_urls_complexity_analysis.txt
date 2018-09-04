@@ -1,0 +1,51 @@
+Big-O Time Complexity
+=====================
+
+1. The program reads the input file one line at a time, and for each line
+    - it finds the url-id for the url string found. <url-id, url-string> is stored in a dictionary. So, it is a O(1) lookup.
+    - it converts the epoch seconds into a date representation string and looks up the string in a dictionary with <'date-string': DailyData> tuples. So, that is a O(1) lookup.
+    - Once the correct DailyData instance is found, it does another O(1) lookup to find the counter for the corresponding url-id and increments the counter. So, that is another O(1) operation for lookup and increment.
+ So, the entire thing in Step 1 runs in N x O(1), where N is the number of lines in the file.
+ 
+2. After all the lines are read in, the DailyData instances are sorted by their start-time for each of those days. If there are D unique days in the input file, then this operation should run in O(D x log(D)) time.
+
+3. Now the program goes over each of the DailyData instances, and calls the printout_sorted() method on them.
+    - printout_sorted() method sorts the <url-id, hit-count> tuples in decreasing order of the hit-count. So, that should take O(M x log(M)) time if there are M distinct url-ids inside the DailyData instance.
+
+So, the entire Step 3 should run in D x O(M x log(M)) where D is the number of unique days in the input file.
+
+Thus the overall operation should take
+O(N) + O(DlogD) + O(D x M x log(M)) time where
+N : number of lines in the file
+D : number of unique days in the input data
+M : average number of unique urls in each day
+
+Since it is stated that D is a relatively small number, we can ignore the O(DlogD) term.
+Thus, it comes down to
+O(N) + O(D x M x log(M))
+
+In one extreme case analysis, if there is just a single day in the input data, and each line corresponds to a unique url, then D=1, N=M, and this reduces to
+O(N) + O(NlogN) or, simply, O(NlogN)
+
+In average case, it is O(D x M x log(M)) where M is the average number of unique urls across all days' buckets.
+
+Big-O Space Complexity
+======================
+1. The program creates a dictionary for all unique urls (M) and assigns them a url-id. Lets assume an url-id is 4 bytes, and the average length of the urls is L bytes. The memory requirement for this is O(M x 4 x L). (assuming memory overhead of the python's dictionary implementation is a small constant per entry)
+2. All these unique urls are also stored in a vector. The position of an url in the vector essentially assigns their url-id's. The memory requirement should be O(M x L).
+3. The entire data is stored in D dictionaries (DailyData object), where D is the number of distinct days. Each DailyData object has 'm' tuples of <url-id, hit-count>. Here the 'm' is the average number of unique url's across all DailyData instances. If each is a 4 byte value, then each DailyData object's memory footprint is O(M x (4+4)) or O(8 x m). [I am keeping the constant terms in order to compare them later].
+4. All the sorting can be assumed to happen in-place, so no additional memory is required.
+
+Thus, the total memory footprint would be
+O(M x 4 x L) + O(M x L) + D x O(8 x m)
+where:
+M : number of unique url's in the input
+L : length of average url string
+D : number of distinct days in the input
+m : average number of unique url's across all DailyData instances
+
+[NOTE: I have kept the constant terms in the formula just to be able to compare against L. Although there is one caveat: the overheads in the python dictionary implementation is not taken into account here.]
+
+
+ 
+ 

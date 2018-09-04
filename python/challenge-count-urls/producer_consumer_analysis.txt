@@ -1,0 +1,57 @@
+Original source code with the bug (with line numbers added)
+===========================================================
+
+1  Producer
+2  while (true) {
+3       item = generate_item()
+4       mutex.lock()
+5       fifo_queue.push(item)
+6       mutex.unlock()
+7       condition.signal()
+8  }
+
+9  Consumers
+10 while(true) {
+11       mutex.lock()
+12       if (fifo_queue.empty()) {
+13             condition.wait(mutex)
+14       }
+15       item = fifo_queue.remove()
+16       mutex.unlock()
+17       process_item(item)
+18 }
+
+
+Potential race condition which can cause the crash:
+==================================================
+1. Let us assume there there 2 consumer threads (tc0 and tc1) and 1 producer thread (tp0) concurrently running on a single core.
+2. Say, tc0 executes line 12, sees the fifo_queue is empty and blocks at line 13 releasing the mutex.
+3. Now tp0 runs through its while loop, adds item into the fifo_queue executes line 6 to unlock the mutex and now gets scheduled out.
+4. Now tc1 runs its while loop; since mutex is unlocked, runs through line 11, finds fifo_queue to have one entry, so executes lines 15-17 and now gets scheduled out.
+5. At this point, tp0 gets scheduled in; it executes line 7 to signal the blocking thread and now gets scheduled out.
+6. The above will wake up the blocked tc0. The tc0 gets unblocked at line 13, i.e. locks the mutex, and tries to get an item from fifo_queue. Note that at this time the fifo_queue is actually empty. So, the program can either crash at line 15, trying to remove from an empty fifo_queue, or, it might return a garbage item object, and calling process_item() on that at line 17 may crash.
+
+
+A possible fix for the crash
+============================
+
+1  Producer
+2  while (true) {
+3       item = generate_item()
+4       mutex.lock()
+5       fifo_queue.push(item)
+6       mutex.unlock()
+7       condition.signal()
+8  }
+
+9  Consumers
+10 while(true) {
+11       mutex.lock()
+12       while (fifo_queue.empty()) { // 'if' replaced with 'while'
+13             condition.wait(mutex)
+14       }
+15       item = fifo_queue.remove()
+16       mutex.unlock()
+17       process_item(item)
+18 }
+
